@@ -1,0 +1,75 @@
+Name: ANDREW RISSE
+Q1.
+graph = TinkerGraph.open()
+g = graph.traversal()
+v1 = g.addV("course").property(id,”CS101”).next()
+v2 = g.addV("course").property(id,"CS201").next()
+v3 = g.addV("course").property(id,"CS220").next()
+v4 = g.addV ("course").property(id,"CS420").next()
+v5 = g.addV("course").property(id,"CS334").next()
+v6 = g.addV("course").property(id,"CS681").next()
+v7 = g.addV("course").property(id,"CS400").next()
+v8 = g.addV("course").property(id,"CS526").next()
+
+e1 = g.addE("requires pre-req").from(v2).to(v1)
+e2 = g.addE("requires pre-req").from(v3).to(v2)
+e3 = g.addE("requires pre-req").from(v4).to(v3)
+e4 = g.addE("requires pre-req").from(v5).to(v2)
+e5 = g.addE("requires pre-req").from(v6).to(v5)
+e6 = g.addE("requires pre-req").from(v7).to(v5)
+e7 = g.addE("requires pre-req").from(v8).to(v7)
+e8 = g.addE("is a co-req of").from(v4).to(v3)
+e9 = g.addE("is a co-req of").from(v8).to(v7)
+
+This query first opens a tinkergraph called “graph”. It then creates a traversal called “g”. Nodes are then individually added to the graph with ID’s that correspond to the course name. Edges are then created and identified as either “requires pre-req” or “is a co-req of” as applicable for each course’s requirements.
+I referenced this website for help: https://kelvinlawrence.net/book/Gremlin-Graph-Guide.html#reload
+
+Q2.  
+g.V().outE('requires pre-req').outV().as('a').outE('is a co-req of').inV().as('b').select('a', 'b')
+This query first traverses the nodes and selects as ‘a’ all nodes that have edges going out of them that are ‘requires pre-req’ edges. It then takes that subset of nodes and looks for edges going out called ‘is a co-req of’ then finds what vertex those go into and labels them as ‘b’. It then selects ‘a’ and ‘b’ as a pair to display the answer.
+
+Q3. 
+g.V("CS526").repeat(out('requires pre-req')).emit().until(hasId("CS101"))
+This query takes the given node and checks for a ‘requires pre-req’ edge and emits the node that is the pre-req. It then repeats this process starting with the new pre-req node until it gets to the CS101 node which is a pre-req for all other courses.
+
+Q4.
+g.V().hasId("CS101").repeat(__.in()).emit().path().count(local).max()
+This query was modified from http://tinkerpop.apache.org/docs/current/recipes/ under the “Maximum Depth” section. It works by starting with the node specified in the hasId section. It then repeately traverses in on all edges, emits each vertex as it traverses, computes each path and its length, and picks the largest path.  The __ modifier to .in is required because .in is a reserved keyword.
+I also referenced this: https://stackoverflow.com/questions/47322473/what-is-the-use-of-double-underscore-in-repeat-or-other-steps-in-tinkerpop-gre
+
+Extra Credit
+Q1.
+g = TinkerGraph.open().traversal()
+
+g.addV('course').property(id,'CS101').as('CS101').
+addV('course').property(id,'CS201').as('CS201').
+addV('course').property(id,'CS220').as('CS220').
+addV('course').property(id,'CS420').as('CS420').
+addV('course').property(id,'CS334').as('CS334').
+addV('course').property(id,'CS681').as('CS681').
+addV('course').property(id,'CS400').as('CS400').
+addV('course').property(id,'CS526').as('CS526').
+addE("requires pre-req").from('CS201').to('CS101').
+addE("requires pre-req").from('CS220').to('CS201').
+addE("requires pre-req").from('CS420').to('CS220').
+addE("requires pre-req").from('CS334').to('CS201').
+addE("requires pre-req").from('CS681').to('CS334').
+addE("requires pre-req").from('CS400').to('CS334').
+addE("requires pre-req").from('CS526').to('CS400').
+addE("is a co-req of").from('CS420').to('CS220').
+addE("is a co-req of").from('CS526').to('CS400')
+
+The first command opens a tinkergraph and assigns a traversal to 'g'. Then second command first adds all vertexes to the graph, then adds all edges.
+
+Q2. Same as original Q2
+g.V().outE('requires pre-req').outV().as('a').outE('is a co-req of').inV().as('b').select('a', 'b')
+
+Q3. Same as original Q3
+g.V("CS526").repeat(out('requires pre-req')).emit().until(hasId("CS101"))
+
+Q4. Same as original Q4
+g.V().hasId("CS101").repeat(__.in()).emit().path().count(local).max()
+
+
+
+
